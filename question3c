@@ -1,0 +1,42 @@
+using System;
+using System.Collections.Generic;
+
+public class Minefield
+{
+    public static bool FindSafePathForTotoshkaAndAlly(char[,] minefield)
+    {
+        int n = minefield.GetLength(0);  // Number of rows
+        int m = minefield.GetLength(1);  // Number of columns
+
+        var stack = new Stack<(int, int, char)>();  // Start position for Totoshka
+        var visited = new HashSet<(int, int, char)>();  // Set to track visited positions
+
+        stack.Push((0, 0, 'T'));
+
+        while (stack.Count > 0)
+        {
+            var (x, y, flag) = stack.Pop();
+
+            if (x == n - 1 && y == m - 1)  // Target position reached
+                return true;
+
+            if (!visited.Contains((x, y, flag)) && minefield[x, y] == '√')  // Safe position
+            {
+                visited.Add((x, y, flag));
+
+                // Check adjacent cells (up, down, left, right)
+                var neighbors = new List<(int, int)> { (x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1) };
+                foreach (var (nx, ny) in neighbors)
+                {
+                    if (nx >= 0 && nx < n && ny >= 0 && ny < m && !visited.Contains((nx, ny, flag)))
+                    {
+                        var oppositeFlag = flag == 'T' ? 'A' : 'T';  // Flag for the opposite character
+                        stack.Push((nx, ny, oppositeFlag));
+                    }
+                }
+            }
+        }
+
+        return false;  // No safe path found
+    }
+}
